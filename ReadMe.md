@@ -11,11 +11,11 @@ It contains all the data and code needed to reproduce the published analysis.
 ## Contents of the repo
 - Jupyter notebooks: `Theory`,...,`Simulation`. These jupyter notebooks develop the various topics of analysis, starting from raw data, producing figure panels and numerical results for the article along the way. They contain a good number of comments and mathematical sections to guide the user.
 
-`code/`: Contains python files with routines accessed from multiple notebooks.
+- `code/`: Contains python files with routines accessed from multiple notebooks.
 
-`data/`: A place for data files, both input and output. 
+- `data/`: A place for data files, both input and output. 
 
-`figs/`: A place for PDF files that make up the figure panels in the article.
+- `figs/`: A place for PDF files that make up the figure panels in the article.
 
 ## How to reproduce all the analysis starting from raw data
 
