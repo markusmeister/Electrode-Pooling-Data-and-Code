@@ -11,11 +11,11 @@ It contains all the data and code needed to reproduce the published analysis.
 ## Contents of the repo
 - Jupyter notebooks and Matlab files: `Theory`,`Saline`,`Invivo`,`Simulation`. These notebooks develop the various topics of analysis, starting from raw data, producing figure panels and numerical results for the article along the way. They contain a good number of comments and mathematical sections to guide the user. 
 
-- `code/`: Contains routines accessed from multiple notebooks.
+- `code/`: Contains routines accessed from the notebooks.
 
-- `data/`: A place for data files, both input and output. 
+- `data/`: Data files, both input and output. 
 
-- `figs/`: A place for PDF files that make up the figure panels in the article.
+- `figs/`: Image files that make up the figure panels in the article.
 
 ## How to reproduce all the analysis starting from raw data
 
