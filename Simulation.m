@@ -1,19 +1,32 @@
-%main for re-extracting accuracy Yield Pool data needed for plotting fig6
-% (The recovery counts that goes into /data/Pooling_data.csv)
+% -------------------------------------------------------------------------
+% Code to generate Data for plotting Figure 6 in:
+% 
+% Kyu Hyun Lee, Yu-Li Ni, Jennifer Colonell, Bill Karsh, Jan Putzeys,
+% Marius Pachitariu, Timothy D. Harris, and Markus Meister (2021)
+% Electrode pooling: boosting the yield of extracellular recordings with
+% switchable silicon probes.
+
+% This Script to count the Recovered Units with an accuracy score > 0.8 from sorted units' 
+% spiketimes with respect to ground truth units' spiketimes.
+% Confusion matrix was calculated using the matching algo. from 
+% Barnett et al (2016), 
+% https://github.com/ahbarnett/validspike
+% -------------------------------------------------------------------------
+
+
 
 % change to your root folder of the simulation
 simroot = 'D:\Repo\Electrode-Pooling-Data-and-Code';
 cd(simroot); %
 
-% helper functions 
+% Add helper functions 
 addpath(fullfile(simroot,'code','fig_6B_code','validation_code')) 
 %load meta file: Information of parameter, groundtruth, maxsort success
 load(fullfile(simroot,'data','simdata','simMetafile.mat'),'simMetafile');
 
-% run the validation steps for each simpool of each grid param
-%simroot, simfolderName, grdTruthMat_Name, maxpoolednum
-Yield_M = zeros(12,15);
-
+% run the validation steps for each Param
+Yield_M = zeros(12,15); % Place holder
+% For each parameter, count the recovered units from pooling 1:12 tetrodes
 for i = 1:size(simMetafile,1)
     [POOL_SCORE] = validation_fn( simroot, simMetafile{i,1}, simMetafile{i,2}, simMetafile{i,3} );
     Yield_M(1:length(POOL_SCORE.recovery_counts),i) = POOL_SCORE.recovery_counts';
