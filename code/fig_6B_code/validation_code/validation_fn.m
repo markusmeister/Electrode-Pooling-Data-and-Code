@@ -1,12 +1,16 @@
 function [POOL_SCORE] = validation_fn( simroot, simfolderName, grdTruthMat_Name, Max_Pool )
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+% Function that runs the matching algo by Barnett et al and visualize
+% Recovered Units counts with an accuracy score.
+% Sorted units' spikes that are within +- 3 /30,000 sec of
+% Ground Truth units' are counted as matched, otherwise missed.
+% Accuracy defined as Matched Spikes / (Matched Spikes + Miss + False Pos)
+% Units with Accuracy > 0.8 are counted as recovered. 
 
 
-% Update the Folder name that contains the kilosorted folders
+% Folder that contains the kilosorted folders with spiketimes
 simDatafolder = fullfile(simroot,'data' ,'simdata', 'gridsearch', simfolderName);
 
-% update ground truth cell for matching sim vs truth
+% locate ground truth spiketimes for matching sim vs ground truth
 load(fullfile(simDatafolder, grdTruthMat_Name),'ground_truth_cell');
 
 % Update Fig title and successful sorted pool num
@@ -20,17 +24,14 @@ if exist(fullfile(simDatafolder, 'validation_'),'dir')~=7
 end
 confusion_Mat_savedir = fullfile(simDatafolder, 'validation_');
 
-% for loop every thing
-for N_pool = 1:Max_Pool % loop thru all the confusion matrixes
+% Confusion Matrix 
+for N_pool = 1:Max_Pool % loop thru and generate confusion matrixes
      
     sorted_path = fullfile(simDatafolder , sprintf('simpool%s',num2str(N_pool) ) , 'spiketrain_good.mat');
     % load sorted spike time
     load(sorted_path, 'sp')
     
-    
-    % border case of only one unit entry, sp != cell array but a vector, have to cast
-    % it to cell so that the format is correct for the later function call
-    %if N_pool == 1
+    % Border case handling
     if ~isa(sp,'cell')    
         sp_test = cell(1,1);
         sp_test{1} = sp;
@@ -87,17 +88,17 @@ for i = 1:Max_Pool
     % save the confusion matrix visualization
     helper_save_confusionmat(confusion_Mat_savedir, i, test_mat)
     
-    % accuracy score
+    % Calculate accuracy score
     [max_unit_num, unit_magland_accuracies ] = calc_pool_magland_accuracy( test_mat );
     POOL_SCORE.max_recovery_counts(i) = max_unit_num;
     POOL_SCORE.unit_magland_accuracies{1,i} = unit_magland_accuracies;
-    % return yield
+    % return counts of units > Thresh
     POOL_SCORE.recovery_counts(1,i)=sum(POOL_SCORE.unit_magland_accuracies{1,i}(1:POOL_SCORE.max_recovery_counts(i))> POOL_SCORE.good_unit_purity_thresh);
 
 end
 
-%% counting and plotting using magland accuracy
-% yield plot
+%% counting and plotting accuracy
+% Recovery plot
 
 fig= figure;
 pool_t = 1:Max_Pool;
