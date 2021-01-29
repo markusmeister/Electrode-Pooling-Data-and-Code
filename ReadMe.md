@@ -34,6 +34,6 @@ It contains all the data and code needed to reproduce the published analysis.
 - In the `figs/` directory find the name of the figure file of interest, and search for that name in the Jupyter notebooks or m-files.
 
 ## Simulation details (optional) 
-The m-file `code/fig_6B_code/main_genSimulation.m` creates samples of voltage traces for imulated pooling, with parameters of Amp, Firing rate, and Noise.
+The m-file `code/fig_6B_code/main_genSimulation.m` creates samples of voltage traces for simulated pooling, with parameters of Amp, Firing rate, and Noise.
 
 
