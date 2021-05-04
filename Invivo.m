@@ -8,7 +8,7 @@
 % -------------------------------------------------------------------------
 clear all
 
-figure('position',[100, 100, 750, 900]);
+figure('position',[100, 100, 800, 650]);
 
 % -------------------------------------------------------------------------
 % A) Sample neurons
@@ -49,7 +49,7 @@ ylim(ax42,[0,30]);
 xlim(ax42,[0,0.05]*1000);
 
 % Axis labels
-ax_l = subplot('Position',[0.48, 0.5, 0.04, 0.04]);
+ax_l = subplot('Position',[0.48, 0.49, 0.04, 0.04]);
 text(ax_l, 0.5,0.5,'Inter-spike interval (ms)','HorizontalAlignment','center',...
     'FontName','Arial','FontSize',8);
 axis(ax_l, 'off');
@@ -59,7 +59,7 @@ axis(ax_l, 'off');
 % -------------------------------------------------------------------------
 
 % Panel label
-ax_A = subplot('position', [0.02, 0.47, 0.05, 0.05]);
+ax_A = subplot('position', [0.02, 0.46, 0.05, 0.05]);
 text(ax_A, 0, 0.5, 'B', 'FontSize', 13, 'FontName','Arial');
 axis(ax_A,'off');
 
@@ -116,7 +116,8 @@ col(ceil(colsize/2):colsize,2) = (linspace(1,0,ceil(colsize/2))).^(0.3);
 col = flipud(col);
 
 % Plot similarity matrix
-ax1 = subplot('position', [0.07, 0.3, 0.41, 0.19]);
+ax1 = subplot('position', [0.07, 0.1, 0.35,0.35]);
+hold(ax1, 'on');
 imagesc(ax1, 'Cdata', s, [-1,1]);
 ax1.FontSize = 8;
 ax1.FontName = 'Arial';
@@ -128,8 +129,12 @@ colorbar(ax1,'FontSize',8);
 ax1.TickDir = 'out';
 ax1.YDir = 'reverse';
 
+[rowInd, colInd] = find(s>cosine_sim_score_th);
+plot(ax1, colInd, rowInd, 'k.','MarkerSize',1);
+hold(ax1, 'off');
+
 % Plot a distribution of similarity scores
-ax2 = subplot('position', [0.54, 0.3, 0.17, 0.19]);
+ax2 = subplot('position', [0.48, 0.1, 0.17, 0.35]);
 hold(ax2, 'on');
 h = histogram(ax2, s(:),-1:0.05:1,'DisplayStyle','stairs','LineWidth',1.5,...
     'EdgeColor',[0.3 0.3 0.3]);
@@ -145,88 +150,56 @@ ax2.FontSize = 8;
 ax2.FontName = 'Arial';
 clear h
 
+ax2_inset = axes('Position',[0.61 0.37 0.05 0.07]);
+box(ax2_inset,'on');
+h = histogram(ax2_inset, s(:),-1:0.05:1,'DisplayStyle','stairs','LineWidth',1.5,...
+    'EdgeColor',[0.3 0.3 0.3]);
+xlim(ax2_inset, [0.7,1]);
+ylim(ax2_inset, [0,200]);
+ax2_inset.TickDir='out';
+
+clear h
 % -------------------------------------------------------------------------
-% Panel C: Hot sorting
+% C) Hot sorting
 % -------------------------------------------------------------------------
 
 % Panel label
-ax_hotsort_label = subplot('position', [0.73, 0.47, 0.05, 0.05]);
+ax_hotsort_label = subplot('position', [0.67, 0.46, 0.05, 0.05]);
 text(ax_hotsort_label, 0, 0.5, 'C', 'FontSize', 13,  'FontName','Arial');
 axis(ax_hotsort_label,'off');
 
-% Get good matches for manual sort
-m = gen_match(s, cellid_s, cellid_bank01);
-manual = sum(m(3,:)>cosine_sim_score_th);
-manual_half_all_split = length(cellid_s)/2;
-clear s m cellid_s cellid_bank01 wfs_s wf_bank01
-
-% Get good matches for cold sort 
-load(fullfile('.','data','coldsort.mat'),'cellid_s', 'cellid_bank01', 'wfs_s', 'wf_bank01');
-s = compute_sim2(cellid_s, cellid_bank01, wfs_s, wf_bank01, nchans);
-m = gen_match(s, cellid_s, cellid_bank01);
-coldsort = sum(m(3,:)>cosine_sim_score_th);
-coldsort_half_all_split = length(cellid_s)/2;
-clear s m cellid_s cellid_bank01 wfs_s wf_bank01
-
-% Get good matches for hot sort 
-load(fullfile('.','data','hotsort.mat'),'cellid_s', 'cellid_bank01', 'wfs_s', 'wf_bank01');
-s = compute_sim2(cellid_s, cellid_bank01, wfs_s, wf_bank01, nchans);
-m = gen_match(s, cellid_s, cellid_bank01);
-hotsort = sum(m(3,:)>cosine_sim_score_th);
-hotsort_half_all_split = length(cellid_s)/2;
-
 % Axis where the plot will go
-ax_hotsort = subplot('position',[0.8, 0.3, 0.17, 0.19]);
+ax_hotsort = subplot('position',[0.73, 0.1, 0.22, 0.35]);
 
-% Plot bar graph comparing number of good matches in the three methods
-b = bar(ax_hotsort, [manual, coldsort, hotsort],'FaceColor',[0.5,0.5,0.5],...
-    'EdgeColor', 'none');
+bin_edges = 0:25:600;
+p_match_manual = match_amp('manual', bin_edges);
+p_match_coldsort = match_amp('coldsort', bin_edges);
+p_match_hotsort = match_amp('hotsort', bin_edges);
+
+p_match_manual(isnan(p_match_manual))=0;
+p_match_coldsort(isnan(p_match_coldsort))=0;
+p_match_hotsort(isnan(p_match_hotsort))=0;
+
+color_manual = [0,158,119]/255;
+color_hotsort = [217,95,0]/255;
+color_coldsort = [110,110,170]/255;
+
 hold(ax_hotsort,'on');
-plot(ax_hotsort, [0.55,1.45],[manual_half_all_split,manual_half_all_split],'k--');
-plot(ax_hotsort, [1.55,2.45],[coldsort_half_all_split,coldsort_half_all_split],'k--');
-plot(ax_hotsort, [2.55,3.45],[hotsort_half_all_split,hotsort_half_all_split],'k--');
+histogram(ax_hotsort,'BinEdges',bin_edges,'BinCounts',p_match_manual,...
+    'DisplayStyle','stairs','LineWidth',1.5,'EdgeColor',color_manual);
+histogram(ax_hotsort,'BinEdges',bin_edges,'BinCounts',p_match_coldsort,...
+    'DisplayStyle','stairs','LineWidth',1.5,'EdgeColor',color_coldsort); 
+histogram(ax_hotsort,'BinEdges',bin_edges,'BinCounts',p_match_hotsort,...
+    'DisplayStyle','stairs','LineWidth',1.5,'EdgeColor',color_hotsort); 
+text(160, 0.3, 'Manual','FontSize', 8, 'FontName', 'Arial','Color',color_manual); 
+text(160, 0.25, 'Cold sort','FontSize', 8, 'FontName', 'Arial','Color',color_coldsort); 
+text(160, 0.2, 'Hot sort','FontSize', 8, 'FontName', 'Arial','Color',color_hotsort); 
+plot(ax_hotsort,[0,270],[0.5,0.5],'k--');
 hold(ax_hotsort,'off');
-ylabel(ax_hotsort,'Un-mixed cells','FontSize', 11, 'FontName', 'Arial'); 
-ax_hotsort.YTick = 0:40:240;
-ax_hotsort.XTickLabel = {'Manual'; 'Cold sort'; 'Hot sort'};
-ax_hotsort.XTickLabelRotation = 45;
-ax_hotsort.FontSize = 8;
-ax_hotsort.FontName = 'Arial';
-ax_hotsort.YLim = [0,220];
-ax_hotsort.TickDir = 'out';
-ax_hotsort.XAxis.TickLength = [0.00 0.0];
-ax_hotsort.Box = 'off';
-
-% -------------------------------------------------------------------------
-% Panel D: Pooling coefficients
-% -------------------------------------------------------------------------
-
-% Panel label
-ax_pc_comp_label = subplot('position', [0.02, 0.22, 0.05, 0.05]);
-text(ax_pc_comp_label, 0, 0.5, 'D', 'FontSize', 13,  'FontName','Arial');
-axis(ax_pc_comp_label,'off');
-
-% Define subplots
-ax_pc_comp1 = subplot('position',[0.1,0.05,0.2,0.15]);
-ax_pc_comp2 = subplot('position',[0.31,0.05,0.07,0.15]);
-ax_pc_comp3 = subplot('position',[0.1,0.21,0.2,0.05]);
-
-% Plot
-compare_pc(ax_pc_comp1,ax_pc_comp2,ax_pc_comp3)
-
-% -------------------------------------------------------------------------
-% Panel E: Biological noise
-% -------------------------------------------------------------------------
-
-% Panel label
-ax_bio_noise_label = subplot('position', [0.4, 0.22, 0.05, 0.05]);
-text(ax_bio_noise_label, 0, 0.5, 'E', 'FontSize', 13,  'FontName','Arial');
-axis(ax_bio_noise_label,'off');
-
-% Plot
-ax_bio_noise = subplot('position',[0.47, 0.05, 0.17, 0.2]);
-bio_noise(ax_bio_noise);
-
+xlim(ax_hotsort,[0,270])
+ax_hotsort.TickDir='out';
+xlabel(ax_hotsort,'Spike amplitude (\muV)');
+ylabel(ax_hotsort,'Prob(match)');
 
 % -------------------------------------------------------------------------
 % Save output as svg
@@ -237,6 +210,62 @@ saveas(gcf,fullfile('.','figs','fig5-InVivo.svg'))
 % -------------------------------------------------------------------------
 % Functions called
 % -------------------------------------------------------------------------
+function x = id_to_ind(ids, cellids)
+x = zeros(1,length(ids));
+for i=1:length(ids)
+    x(i) = find(cellids==ids(i));
+end
+clear i
+end
+
+function amp = find_p2p_amp_at_peak_channel(wfs)
+% -------------------------------------------------------------------------
+% Given a cell array of waveforms (each of which is channels x samples)
+% returns the peak-to-peak amplitude at the channel with highest amplitude
+% -------------------------------------------------------------------------
+amp = zeros(1,length(wfs));
+for i = 1:length(wfs)    
+    S = wfs{1,i};
+    p2p = max(S,[],2)-min(S,[],2); % peak-to-peak amplitude
+    amp(i) = max(p2p);
+end
+clear i
+
+end
+
+function p_match = match_amp(type, bin_edges)
+if strcmp(type, 'manual')
+% Load waveforms and cell IDs from manual sorting
+    load(fullfile('.','data','manual.mat'),'cellid_s', 'cellid_bank01', 'wfs_s', 'wf_bank01');
+elseif strcmp(type, 'coldsort')
+    load(fullfile('.','data','coldsort.mat'),'cellid_s', 'cellid_bank01', 'wfs_s', 'wf_bank01');
+elseif strcmp(type, 'hotsort')
+    load(fullfile('.','data','hotsort.mat'),'cellid_s', 'cellid_bank01', 'wfs_s', 'wf_bank01');
+else
+    error('recording type undefined');
+end
+
+% Threshold for cosine similarity score; if below this then consider not
+% good match
+cosine_sim_score_th = 0.9;
+
+% Compute similarity matrix (based on the 20 channels around the peak
+% channel)
+nchans = 20;
+s = compute_sim2(cellid_s, cellid_bank01, wfs_s, wf_bank01, nchans);
+
+% Get good matches for manual sort
+m = gen_match(s, cellid_s, cellid_bank01);
+
+% Get IDs of split-mode cells that found a match
+split_match_ids = m(1, m(3,:)>cosine_sim_score_th);
+
+amps_s = find_p2p_amp_at_peak_channel(wfs_s);
+
+[total,~] = histcounts(amps_s, bin_edges);
+[matched,~] = histcounts(amps_s(id_to_ind(split_match_ids, cellid_s)), bin_edges);
+p_match = matched./total;
+end
 
 function plot_wfs(ax, cell_bank0, cell_bank1)
 % -------------------------------------------------------------------------
@@ -382,262 +411,6 @@ ax.FontName = 'Arial';
 title(ax, ['Mean firing rate: ', num2str(round(length(spikes)/spikes(end),2)), ' sp/s'],...
     'FontSize',9,'FontName','Arial','FontWeight','normal', 'FontSize', 8);
 ylim(ax, [0, max(h.Values)*1.1]);
-end
-
-function compare_pc(ax1, ax2, ax3)
-% -------------------------------------------------------------------------
-% Plots the pooling coefficients measured in saline and in vivo
-% 
-% Parameters
-% ----------
-% ax1
-%   axis for scatter plot
-% ax2
-%   axis for histogram
-% ax3
-%   axis for histogram
-% -------------------------------------------------------------------------
-
-% Load detected amplitude of sine wave in saline applied in one orientation
-load(fullfile('.','data','new_sig_top.mat'),'amps_bank0', 'amps_bank1', 'amps_bank01');
-a = cell(1,384);
-for i=1:384
-    a{1,i} = zeros(2,3);
-    a{1,i}(1,1) = amps_bank0(i);
-    a{1,i}(1,2) = amps_bank1(i);
-    a{1,i}(1,3) = amps_bank01(i);
-end
-clear i
-% Load detected amplitude of sine wave in saline applied in another
-% orientation
-load(fullfile('.','data','new_sig_bottom.mat'),'amps_bank0', 'amps_bank1', 'amps_bank01');
-for i=1:384
-    a{1,i}(2,1) = amps_bank0(i);
-    a{1,i}(2,2) = amps_bank1(i);
-    a{1,i}(2,3) = amps_bank01(i);
-end
-clear i
-% Compute pooling coefficient from these measurements
-c = zeros(2,384);
-for i=1:384
-    c(:,i) = a{1,i}(:,1:2)\a{1,i}(:,3);
-end
-clear i
-clear a
-
-% Define pooling coefficient for bank 0 and 1 (saline)
-c0 = c(1,:);
-c1 = c(2,:);
-
-% Load waveforms for bank 0 and 1 (in vivo)
-load(fullfile('.','data','manual.mat'),'cellid_s', 'cellid_bank01', 'wfs_s', 'wf_bank01');
-
-% Compute matches to find sites where pooling coefficients from both banks
-% can be obtained
-th = 25;
-s = compute_sim(cellid_s, cellid_bank01, wfs_s, wf_bank01, th);
-m = gen_match(s, cellid_s, cellid_bank01);
-
-% Find the pooling coefficients
-[exposed_c0, exposed_c1, sigsites] = pc_exposed_sites(m, wfs_s, wf_bank01, cellid_s, cellid_bank01, th);
-
-% Colors for banks 0 and 1
-col_bank0 = [228,26,28]/255;
-col_bank1 = [55,126,184]/255;
-
-% Plot
-hold(ax1, 'on');
-plot(ax1, c0(sigsites), exposed_c0, '.','color',col_bank0);
-plot(ax1, c1(sigsites), exposed_c1, '.','color',col_bank1);
-plot(ax1, [0,1],[0,1],'k-');
-xlim(ax1, [0,1]);
-ylim(ax1, [0,1]);
-xlabel(ax1, 'Saline');
-ylabel(ax1, 'In vivo');
-xticks(ax1, 0:0.25:1);
-yticks(ax1, 0:0.25:1);
-hold(ax1, 'off');
-ax1.TickDir = 'out';
-ax1.FontSize = 8;
-ax1.FontName = 'Arial';
-
-binsize=0.05;
-
-hold(ax3, 'on');
-histogram(ax3, c0(sigsites),0:binsize:1,'Normalization','probability',...
-    'DisplayStyle','stairs','LineWidth',1.5, 'EdgeColor',col_bank0);
-histogram(ax3, c1(sigsites),0:binsize:1,'Normalization','probability',...
-    'DisplayStyle','stairs','LineWidth',1.5, 'EdgeColor',col_bank1);
-ax3.TickDir = 'out';
-set(ax3,'xtick',[])
-set(ax3,'xticklabel',[])
-set(ax3, 'YTick', [0    0.2000    0.4000    0.6000]);
-ylim(ax3, [0,0.4]);
-xlim(ax3, [0,1]);
-ylabel(ax3, 'Probability');
-text(ax3, 0.8, 0.3, [num2str(round(mean(c0(sigsites)),2)),'\pm',num2str(round(std(c0(sigsites)),2))],...
-    'color',col_bank0,'FontSize',7,'FontName','Arial');
-text(ax3, 0.8, 0.2, [num2str(round(mean(c1(sigsites)),2)),'\pm',num2str(round(std(c1(sigsites)),2))],...
-    'color',col_bank1,'FontSize',7,'FontName','Arial');
-hold(ax3, 'off');
-ax3.FontSize = 8;
-ax3.FontName = 'Arial';
-
-hold(ax2, 'on');
-histogram(ax2, exposed_c0, 0:binsize:1, 'Orientation','horizontal',...
-    'Normalization','probability','DisplayStyle','stairs',...
-    'LineWidth',1.5, 'EdgeColor',col_bank0);
-histogram(ax2, exposed_c1, 0:binsize:1, 'Orientation','horizontal',...
-    'Normalization','probability','DisplayStyle','stairs',...
-    'LineWidth',1.5, 'EdgeColor',col_bank1);
-ax2.TickDir = 'out';
-set(ax2,'ytick',[])
-set(ax2,'yticklabel',[])
-set(ax2, 'XTick', [0    0.2000    0.4000    0.6000]);
-xlim(ax2, [0,0.4]);
-ylim(ax2, [0,1]);
-xlabel(ax2, 'Probability');
-text(ax2, 0.15, 0.2, [num2str(round(mean(exposed_c0),2)),'\pm',num2str(round(std(exposed_c0),2))],...
-    'color',col_bank0,'FontSize',7,'FontName','Arial');
-text(ax2, 0.15, 0.1, [num2str(round(mean(exposed_c1),2)),'\pm',num2str(round(std(exposed_c1),2))],...
-    'color',col_bank1,'FontSize',7,'FontName','Arial');
-hold(ax2, 'off');
-ax2.FontSize = 8;
-ax2.FontName = 'Arial';
-
-end
-
-function [exposed_c0, exposed_c1, sites_ind] = pc_exposed_sites(m, wfs_s, wf_bank01, cellid_s, cellid_bank01, th)
-% -------------------------------------------------------------------------
-% Computes pooling coefficients of 'exposed sites': recording sites where
-% the pooling coefficient for both bank0 and bank1 can be computed because
-% a cell was detected in both banks
-
-% Parameters
-% ----------
-% m : array (3, k)
-%   output of get_match
-% th : float
-%   threshold; a site is considered to have detected signal if the
-%   peak-to-peak waveform of a cell at that site exceeds this threshold
-% 
-% Output
-% ------
-% exposed_c0: array
-%   pooling coefficient for bank 0 exposed sites
-% exposed_c1 : array
-%   pooling coefficient for bank 1 exposed sites
-% sites_ind : array
-%   index of exposed sites
-% -------------------------------------------------------------------------
-
-% Cosine similiarity threshold to be considered good match
-cosine_sim_score_th = 0.9;
-% Number of sites
-nchans = size(wfs_s{1,1},1);
-
-% Matches that exceed similarity score threshold
-m_g = m(:, m(3,:) > cosine_sim_score_th);
-
-% Find pooling coefficients of sites that have detected signal
-c = zeros(nchans, size(m_g,2));
-for i = 1:size(m_g,2)
-    
-    S = wfs_s{1,cellid_s==m_g(1,i)};
-    P = wf_bank01{1,cellid_bank01==m_g(2,i)};
-    
-    p2p = max(S,[],2) - min(S,[],2);
-    sigchan = find(p2p>th);
-    
-    pc = get_pc(S, P)';
-    c(sigchan,i) = pc(sigchan);
-end
-clear i S P p2p pc
-
-c0 = c(:,m_g(1,:)<10000);
-c1 = c(:,m_g(1,:)>=10000);
-
-% If multiple pooling coefficient values for a given site (because detects
-% multiple cells), then average them
-mean_c0 = nan(1, nchans);
-for i=1:nchans
-    x = c0(i,:); % all pooling coefficient estimates for channel i
-    if sum(x)==0
-        continue
-    else
-        mean_c0(i) = mean(x(x>0));
-    end
-end
-clear i x
-
-mean_c1 = nan(1, nchans);
-for i=1:nchans
-    x = c1(i,:);
-    if sum(x)==0
-        continue
-    else
-        mean_c1(i) = mean(x(x>0));
-    end
-end
-clear i x
-
-% Return output
-exposed_c0 = mean_c0(~isnan(mean_c0) & ~isnan(mean_c1));
-exposed_c1 = mean_c1(~isnan(mean_c0) & ~isnan(mean_c1));
-sites_ind = find(~isnan(mean_c0) & ~isnan(mean_c1));
-
-end
-
-function bio_noise(ax)
-% -------------------------------------------------------------------------
-% Plots a histogram of estimated biological noise for a set of electrodes
-% for which this was possible
-% 
-% Parameters
-% ----------
-% ax : Axis object
-%   subplot to plot the output
-% -------------------------------------------------------------------------
-
-% Color for bank0 and bank1
-col_bank0 = [228,26,28]/255;
-col_bank1 = [55,126,184]/255;
-
-% These are the channels without any spikes (i.e. suitable for estimating
-% biological noise)
-chans = 66:77;
-
-% Load noise measured in saline
-load(fullfile('.','data','noise.mat'),'noise')
-% Load noise measured in vivo
-load(fullfile('.','data','noise_invivo.mat'),'s_0','s_1','s_01');
-
-% Thermal noise computed from estimated amplifier noise and noise in PBS
-Amp = noise{1,1}(chans,5);
-T_0 = sqrt(noise{1,1}(chans,4).^2 - Amp.^2);
-T_1 = sqrt(noise{1,2}(chans,4).^2 - Amp.^2);
-
-% Biological noise can be estimated by subtracting thermal and amplifier
-% noise from overall in vivo noise
-B_0 = sqrt(s_0.^2-Amp.^2-T_0.^2);
-B_1 = sqrt(s_1.^2-Amp.^2-T_1.^2);
-
-% Plot
-hold(ax, 'on');
-histogram(ax, B_0, 4:0.5:16, 'Normalization','probability','LineWidth',1.5,...
-    'DisplayStyle','stairs','EdgeColor',col_bank0);
-histogram(ax, B_1, 4:0.5:16, 'Normalization','probability','LineWidth',1.5,...
-    'DisplayStyle','stairs','EdgeColor',col_bank1);
-hold(ax, 'off');
-xlabel(ax, 'Biological noise (\muV)');
-ylabel(ax, 'Probability');
-ylim(ax, [0,0.55]);
-xlim(ax, [4,16]);
-ax.TickDir = 'out';
-ax.Box = 'off';
-ax.FontSize = 8;
-ax.FontName = 'Arial';
-
 end
 
 function m = gen_match(s, cellid_s, cellid_bank01)
