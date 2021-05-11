@@ -1,6 +1,6 @@
 # Electrode Pooling Data and Code
 
-MM 1/26/2021
+MM 5/11/2021
 
 This repo accompanies our preprint
 
@@ -19,7 +19,7 @@ It contains all the data and code needed to reproduce the published analysis.
 
 ## How to reproduce all the analysis starting from raw data
 
-0. Read our paper. A version from Dec 2020 is included in the repo.   
+0. Read our paper. A version from May 3, 2021 is included in the repo.   
 1. Empty the `figs/` directory.
 3. Run the notebooks and m-files in this order: 
 	* `Theory.ipynb` - Fig 2
@@ -30,7 +30,7 @@ It contains all the data and code needed to reproduce the published analysis.
 4. Now the `figs/` directory should contain all the figure panels. 
 
 ## How to find code for a specific figure panel
-- The names of all the figure panels (as numbered in the preprint of Dec 2020) appear as level-3 headings in the Jupyter notebooks. Look through these to find your figure of interest. Or...
+- The names of all the figure panels (as numbered in the preprint) appear as headings in the Jupyter notebooks. Look through these to find your figure of interest. Or...
 - In the `figs/` directory find the name of the figure file of interest, and search for that name in the Jupyter notebooks or m-files.
 
 ## Simulation details (optional) 
