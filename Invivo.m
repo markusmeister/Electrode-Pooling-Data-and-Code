@@ -202,9 +202,15 @@ xlabel(ax_hotsort,'Spike amplitude (\muV)');
 ylabel(ax_hotsort,'Prob(match)');
 
 % -------------------------------------------------------------------------
-% Save output as svg
+% Save output
 % -------------------------------------------------------------------------
-saveas(gcf,fullfile('.','figs','fig5-InVivo.svg'))
+% Uncomment to save figure as svg
+% saveas(gcf,fullfile('.','figs','fig5-InVivo.svg'))
+fig = gcf;
+fig.PaperPositionMode = 'auto';
+fig_pos = fig.PaperPosition;
+fig.PaperSize = [fig_pos(3) fig_pos(4)];
+print('-bestfit',fig,fullfile('.','figs','fig5-InVivo.pdf'),'-dpdf')
 
 %%
 % -------------------------------------------------------------------------

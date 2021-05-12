@@ -27,6 +27,7 @@ It contains all the data and code needed to reproduce the published analysis.
 	* `Invivo.m` - Fig 5
 	* `Simulation.m` - Fig 6
 	* `Simulation_Fig.ipynb` - Fig 6
+	* `accuracyQC.m` - Fig 9
 4. Now the `figs/` directory should contain all the figure panels. 
 
 ## How to find code for a specific figure panel
