@@ -1,10 +1,10 @@
 # Electrode Pooling Data and Code
 
-MM 5/11/2021
+MM 7/12/2021
 
 This repo accompanies our preprint
 
-**Kyu Hyun Lee, Yu-Li Ni, Jennifer Colonell, Bill Karsh, Jan Putzeys, Marius Pachitariu, Timothy D. Harris, and Markus Meister (2021) Electrode pooling: boosting the yield of extracellular recordings with switchable silicon probes**
+**[Kyu Hyun Lee, Yu-Li Ni, Jennifer Colonell, Bill Karsh, Jan Putzeys, Marius Pachitariu, Timothy D. Harris, and Markus Meister (2021) Electrode pooling: boosting the yield of extracellular recordings with switchable silicon probes. BioRxiv 851691.] (https://www.biorxiv.org/content/10.1101/851691v2)**
 
 It contains all the data and code needed to reproduce the published analysis.
 
