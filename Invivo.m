@@ -180,9 +180,9 @@ p_match_manual(isnan(p_match_manual))=0;
 p_match_coldsort(isnan(p_match_coldsort))=0;
 p_match_hotsort(isnan(p_match_hotsort))=0;
 
-color_manual = [0,158,119]/255;
-color_hotsort = [217,95,0]/255;
-color_coldsort = [110,110,170]/255;
+color_manual = [0,0,0]/255;
+color_hotsort = [230,159,0]/255;
+color_coldsort = [86,180,233]/255;
 
 hold(ax_hotsort,'on');
 histogram(ax_hotsort,'BinEdges',bin_edges,'BinCounts',p_match_manual,...
